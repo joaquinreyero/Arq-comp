@@ -47,7 +47,7 @@ void menu(){
             printf("El choque\n");
             break;
         case 3:
-            printf("op3\n");
+            printf("La carrera\n");
             break;
         case 4:
             printf("op4\n");
@@ -57,10 +57,14 @@ void menu(){
         }
 }
 
+/*
+    Setea velocidad
+*/
+void velocidad();
 /*  
     Funcion del auto fantastico
 */
-void auto_fantástico();
+void autoFantastico();
 
 /*
     Funcion del choque
@@ -96,11 +100,11 @@ int main() {
                 printf("\nBienvenido al Sistema\n");
                 break;
             } else {
-                printf("\nPassword no válida\n");
+                printf("\nClave no válida\n");
                  claveCorrecta = false;
             }
         } else {
-            printf("\nPassword no válida\n");
+            printf("\nClave no válida\n");
             claveCorrecta = false;
         }
     }
