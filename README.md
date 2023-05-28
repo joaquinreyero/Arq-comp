@@ -1,5 +1,5 @@
-# Proyecto arquitectura de computadora I
- 
+# PROYECTO ARQUITECURA DE COMPUTADORAS I
+
 Los siguientes ejercicios a desarrollar en los prácticos de laboratorio constituyen la columna
 vertebral del proyecto:
 
