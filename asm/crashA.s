@@ -1,4 +1,5 @@
 .text
+.extern intToBinario
 .global crashA
 crashA:
 				STMFD	SP!, {r0,r4, r5, r6, LR} 

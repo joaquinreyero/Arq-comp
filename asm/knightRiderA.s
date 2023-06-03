@@ -1,4 +1,5 @@
 .text
+.extern intToBinario
 .global knightRiderA
 
 knightRiderA:
