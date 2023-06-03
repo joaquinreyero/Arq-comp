@@ -5,8 +5,12 @@
 #include <ncurses.h>
 #include <cstring> 
 #include <cstdlib> 
+#include <wiringPi.h>
+
 
 unsigned long int speed = 150000000;
+int leds[] = {16,15,0,1,2,4,3,5};
+
 
 bool login();
 void menu();
@@ -119,82 +123,6 @@ void menu()
     }
 }
 
-void subMenu(int sequence)
-{
-    int option = -1;
-
-    while (option != 0) {
-        std::cout << "=====================" << std::endl;
-        std::cout << "  Seleccione una plataforma:  " << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "1. Terminal" << std::endl;
-        std::cout << "2. Leds" << std::endl;
-        std::cout << "0. Salir" << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "Ingrese una opción: ";
-        std::cin >> option;
-        std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
-
-        switch (option) 
-        {
-            case 1:
-                switch (sequence)
-                {
-                    case 1:
-                        knightRider(speed);
-                        break;
-                    case 2:
-                        crash(speed);
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        break;
-                    case 5:
-                        break;
-                    default:
-                        std::cout << "\nOpción inválida.\n" << std::endl;
-                        menu();
-                        break;
-                }
-                break;
-
-            case 2:
-                switch (sequence)
-                    {
-                        case 1:
-                            knightRiderA();
-                            intToBinario(0);
-                            break;
-                        case 2:
-                            crashA();
-                            intToBinario(0);
-                            break;
-                        case 3:
-                            break;
-                        case 4:
-                            break;
-                        case 5:
-                            break;
-                        default:
-                            std::cout << "\nOpción inválida.\n" << std::endl;
-                            menu();
-                            break;
-                    }
-                break;
-            case 0:
-                std::cout << "\nVolviendo al Menu..." << std::endl;
-                menu();
-                break;
-            default:
-                std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
-                break;
-        }
-
-        std::cout << std::endl;
-    }
-}
-
 void delay (unsigned long int a) 
 {
     while (a)
@@ -216,6 +144,26 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     refresh();
 }
 
+void displayLeds()
+{
+    for (int i = 0; i < numLEDs; i++) {
+        if (data & (1 << i)) {
+            digitalWrite(leds[i], HIGH);
+        } else {
+            digitalWrite(leds[i], LOW);
+        }
+    }
+
+    std::cout << std::endl;
+}
+
+void setupLeds()
+{
+    for (int i = 0; i < 8; i++) {
+        pinMode(leds[i], OUTPUT);
+    }
+}
+
 void knightRider(unsigned long int initialSpeed) 
 {
     unsigned char data = 0x01;
@@ -229,6 +177,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
+            displayLeds();
 
             data = (data << 1) | (data >> 7);
 
@@ -254,6 +203,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
+            displayLeds();
 
             data = (data >> 1) | (data << 7);
 
@@ -295,6 +245,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
+            displayLeds();
             delay(initialSpeed);
             int key = getch();
             switch (key) {
@@ -318,6 +269,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
+            displayLeds();
             delay(initialSpeed);
             int key = getch();
             switch (key) {
@@ -340,18 +292,13 @@ void crash(unsigned long int initialSpeed)
     endwin(); 
 }
 
-
-int main(){
-    intToBinario(1);
-}
-
 int main()
 {
 
     bool loguedIn = login();
     
     if (loguedIn){
-        setupGPIO();
+        setupLeds();
         menu();
     }
     return 0;
