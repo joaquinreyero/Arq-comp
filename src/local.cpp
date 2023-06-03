@@ -4,77 +4,108 @@
 #include <unistd.h>
 #include <ncurses.h>
 
-bool login () 
+unsigned long int speed = 150000000;
+
+bool login();
+void menu();
+void delay(unsigned int a);
+void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName);
+void knightRider(unsigned long int initialSpeed);
+void crash(unsigned long int initialSpeed);
+
+
+bool login() 
 {
-    struct termios oldSettings, newSettings;
-    tcgetattr(STDIN_FILENO, &oldSettings);
-    newSettings = oldSettings;
-    newSettings.c_lflag &= ~ICANON;   // Desactiva el modo de línea canónica
-    newSettings.c_lflag &= ~ECHO;     // Desactiva la eco de caracteres
-    tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
+    const std::string psw = "12345";    
+    const int maxAttempts = 3;          
+    int attempts = 0;                   
 
-    const std::string claveGuardada = "12345";  // Clave guardada
-    const int intentosMaximos = 3;             // Número máximo de intentos
-    int intentos = 0;                          // Contador de intentos
+    initscr();  // Inicializar la pantalla de ncurses
+    noecho();   // Desactivar la eco de caracteres
 
-    while (intentos < intentosMaximos) {
-        std::string claveIngresada;
-        std::cout << "Ingresa la clave de 5 digitos: ";
-        std::cin >> claveIngresada;
+    while (attempts < maxAttempts) {
+        std::string enteredPsw;
+        printw("Ingresa la clave de 5 dígitos: ");
+        refresh();
 
-        if (claveIngresada == claveGuardada) {
-            std::cout << "Clave correcta. Acceso concedido." << std::endl;
-            tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);  // Restaura la configuración original de la terminal
+        char c;
+        while ((c = getch()) != '\n') {
+            if (c == '\b') {
+                if (!enteredPsw.empty()) {
+                    enteredPsw.pop_back();
+                    printw("\b \b");
+                    refresh();
+                }
+            } else {
+                enteredPsw += c;
+                printw("*");
+                refresh();
+            }
+        }
+        printw("\n");
+
+        if (enteredPsw == psw) {
+            printw("Clave correcta. Acceso concedido.\n");
+            refresh();
+            endwin();  
             return true;
         } else {
-            std::cout << "Clave incorrecta. Intento fallido." << std::endl;
-            intentos++;
+            printw("Clave incorrecta. Intento fallido.\n");
+            refresh();
+            attempts++;
         }
     }
 
-    std::cout << "Número máximo de intentos alcanzado. Acceso denegado." << std::endl;
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);  // Restaura la configuración original de la terminal
+    printw("Número máximo de intentos alcanzado. Acceso denegado.\n");
+    refresh();
+    endwin();  
     return false;
 }
 
-void menu () 
+void menu() 
 {
-int opcion = -1;
+    int opcion = -1;
 
     while (opcion != 0) {
-        std::cout << "Bienvenido" << std::endl;
-        std::cout << "1. El auto fantástico\n" << std::endl;
-        std::cout << "2. El choque\n" << std::endl;
+        std::cout << "=====================" << std::endl;
+        std::cout << "      BIENVENIDO      " << std::endl;
+        std::cout << "=====================" << std::endl;
+        std::cout << "1. El auto fantástico" << std::endl;
+        std::cout << "2. El choque" << std::endl;
         std::cout << "3. Opción 3" << std::endl;
         std::cout << "4. Opción 4" << std::endl;
         std::cout << "0. Salir" << std::endl;
+        std::cout << "=====================" << std::endl;
         std::cout << "Ingrese una opción: ";
         std::cin >> opcion;
 
         switch (opcion) {
             case 1:
-                //opcion1();
+                std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
+                knightRider(speed);
                 break;
             case 2:
-                //opcion2();
+                std::cout << "\n*** Ejecutando el choque ***\n" << std::endl;
+                crash(speed);
                 break;
             case 3:
+                std::cout << "\n*** Opción 3 seleccionada ***\n" << std::endl;
                 //opcion3();
                 break;
             case 4:
+                std::cout << "\n*** Opción 4 seleccionada ***\n" << std::endl;
                 //opcion4();
                 break;
             case 0:
-                std::cout << "Saliendo del programa..." << std::endl;
+                std::cout << "\nSaliendo del programa..." << std::endl;
                 break;
             default:
-                std::cout << "Opción inválida. Intente nuevamente." << std::endl;
+                std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
                 break;
         }
 
         std::cout << std::endl;
     }
-
 }
 
 void delay (unsigned long int a) 
@@ -83,7 +114,8 @@ void delay (unsigned long int a)
         a--;
 }
 
-void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName) {
+void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName) 
+{
     printw("\n"); 
     printw("======= %s =======\n", sequenceName.c_str()); 
     printw("Velocidad: %lu\n", speed); 
@@ -97,7 +129,8 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     refresh();
 }
 
-void knightRider(unsigned long int speed) {
+void knightRider(unsigned long int initialSpeed) 
+{
     unsigned char data = 0x01;
     initscr();
     curs_set(0); // Ocultar el cursor
@@ -108,46 +141,50 @@ void knightRider(unsigned long int speed) {
 
         for (int i = 0; i < 7; i++) {
             clear();
-            displayTerminal(data, speed, "KnightRider");
+            displayTerminal(data, initialSpeed, "KnightRider");
 
             data = (data << 1) | (data >> 7);
 
-            delay(speed);
+            delay(initialSpeed);
 
             int key = getch();
             switch (key) {
                 case 27: // Tecla Escape
-                    endwin(); 
-                    return;
+                    endwin();
+                    speed = initialSpeed;
+                    std::cout << "\n*** Cerrando el auto fantástico ***\n" << std::endl; 
+                    menu();
                 case KEY_UP: 
-                    if (speed >= 100)
-                        speed -= 100;
+                    if (initialSpeed >= 10000000)
+                        initialSpeed -= 10000000;
                     break;
                 case KEY_DOWN: 
-                    speed += 100;
+                    initialSpeed += 10000000;
                     break;
             }
         }
 
         for (int i = 0; i < 7; i++) {
             clear();
-            displayTerminal(data, speed, "KnightRider");
+            displayTerminal(data, initialSpeed, "KnightRider");
 
             data = (data >> 1) | (data << 7);
 
-            delay(speed);
+            delay(initialSpeed);
 
             int key = getch();
             switch (key) {
                 case 27: // Tecla Escape
-                    endwin(); 
-                    return;
+                    endwin();
+                    speed = initialSpeed; 
+                    std::cout << "\n*** Cerrando el auto fantástico ***\n" << std::endl;
+                    menu();
                 case KEY_UP: 
-                    if (speed >= 100)
-                        speed -= 100;
+                    if (initialSpeed >= 10000000)
+                        initialSpeed -= 10000000;
                     break;
                 case KEY_DOWN: 
-                    speed += 100;
+                    initialSpeed += 10000000;
                     break;
             }
         }
@@ -156,7 +193,74 @@ void knightRider(unsigned long int speed) {
     endwin();
 }
 
+void crash(unsigned long int initialSpeed) 
+{
 
-int main(){
-    knightRider(150000000);
+    unsigned char table []={0x81,0x42,0x24, 0x18};
+    initscr();
+    curs_set(0); // Ocultar el cursor
+    nodelay(stdscr, true); // Habilitar la entrada no bloqueante
+    keypad(stdscr, true); // Habilitar el modo de captura de teclas especiales
+        
+    while (true) 
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            clear();
+            displayTerminal(table[i], initialSpeed, "Crash");
+            delay(initialSpeed);
+            int key = getch();
+            switch (key) {
+                case 27: // Tecla Escape
+                    endwin();
+                    speed = initialSpeed; 
+                    std::cout << "\n*** Cerrando el choque ***\n" << std::endl;
+                    menu();
+                case KEY_UP: 
+                    if (initialSpeed >= 10000000)
+                        initialSpeed -= 10000000;
+                    break;
+                case KEY_DOWN: 
+                    initialSpeed += 10000000;
+                    break;
+            } 
+            if (i == 4)
+                 delay(initialSpeed);
+        }
+        for (int i = 3; i > 0; i--)
+        {
+            clear();
+            displayTerminal(table[i], initialSpeed, "Crash");
+            delay(initialSpeed);
+            int key = getch();
+            switch (key) {
+                case 27: // Tecla Escape
+                    endwin();
+                    speed = initialSpeed;
+                    std::cout << "\n*** Cerrando el choque ***\n" << std::endl; 
+                    menu();
+                case KEY_UP: 
+                    if (initialSpeed >= 10000000)
+                        initialSpeed -= 10000000;
+                    break;
+                case KEY_DOWN: 
+                    initialSpeed += 10000000;
+                    break;
+            }  
+        }    
+    }
+    
+    endwin(); 
+}
+
+
+int main()
+{
+
+    bool loguedIn = login();
+    
+    if (loguedIn){
+        menu();
+    }
+    return 0;
 }
