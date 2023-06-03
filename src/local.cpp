@@ -7,11 +7,6 @@
 #include <cstdlib> 
 
 unsigned long int speed = 150000000;
-int GPIOpins[]= {8,10,11,12,13,15,16,18};
-int bits[8];
-
-extern "C" void knightRiderA();
-extern "C" void crashA();
 
 bool login();
 void menu();
@@ -221,61 +216,6 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     refresh();
 }
 
-void intToBinario(int n)
-{
-    int bits[8];
-    int i = 7;
-    while (i != -1) {
-        bits[i] = n % 2;
-        n = n / 2;
-        i = i - 1;
-    }
-    for (int x = 0; x < 8; x++) {
-        ledOn(GPIOpins[x], bits[x]);
-    }
-}
-
-void setupGPIO()
-{
-    system("gpio -g mode 8 output");
-	system("gpio -g mode 10 output");
-	system("gpio -g mode 11 output");
-	system("gpio -g mode 12 output");
-	system("gpio -g mode 13 output");
-	system("gpio -g mode 15 output");
-	system("gpio -g mode 16 output");
-	system("gpio -g mode 18 output");
-}
-
-void ledOn(int pin, int estado)
-{
-    const int MAX = 100;
-
-    char cadenaRescri[MAX];
-    memset(cadenaRescri, 0, sizeof(cadenaRescri));
-    sprintf(cadenaRescri, "%u", pin);
-
-    char primera[MAX];
-    memset(primera, 0, sizeof(primera));
-    memccpy(primera, "gpio -g write ", '\0', sizeof(primera)) - 1;
-    memccpy(primera, cadenaRescri, '\0', sizeof(primera));
-
-    char segunda[MAX];
-    memset(segunda, 0, sizeof(segunda));
-    memccpy(segunda, primera, '\0', sizeof(segunda)) - 1;
-    if (estado == 1) {
-        memccpy(segunda, " 1", '\0', sizeof(segunda));
-    } else {
-        memccpy(segunda, " 0", '\0', sizeof(segunda));
-    }
-
-    system(segunda);
-
-    memset(primera, 0, sizeof(primera));
-    memset(segunda, 0, sizeof(segunda));
-    memset(cadenaRescri, 0, sizeof(cadenaRescri));
-}
-
 void knightRider(unsigned long int initialSpeed) 
 {
     unsigned char data = 0x01;
@@ -398,6 +338,11 @@ void crash(unsigned long int initialSpeed)
     }
     
     endwin(); 
+}
+
+
+int main(){
+    intToBinario(1);
 }
 
 int main()
