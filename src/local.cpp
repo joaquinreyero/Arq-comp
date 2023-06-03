@@ -3,13 +3,24 @@
 #include <termios.h>
 #include <unistd.h>
 #include <ncurses.h>
+#include <cstring> 
+#include <cstdlib> 
 
 unsigned long int speed = 150000000;
+int GPIOpins[]= {8,10,11,12,13,15,16,18};
+int bits[8];
+
+extern "C" void knightRiderA();
+extern "C" void crashA();
 
 bool login();
 void menu();
+void subMenu();
 void delay(unsigned int a);
 void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName);
+void intToBinario(int n);
+void setupGPIO();
+void ledOn(int pin, int estado);
 void knightRider(unsigned long int initialSpeed);
 void crash(unsigned long int initialSpeed);
 
@@ -64,9 +75,9 @@ bool login()
 
 void menu() 
 {
-    int opcion = -1;
+    int option = -1;
 
-    while (opcion != 0) {
+    while (option != 0) {
         std::cout << "=====================" << std::endl;
         std::cout << "      BIENVENIDO      " << std::endl;
         std::cout << "=====================" << std::endl;
@@ -74,12 +85,13 @@ void menu()
         std::cout << "2. El choque" << std::endl;
         std::cout << "3. Opción 3" << std::endl;
         std::cout << "4. Opción 4" << std::endl;
+        std::cout << "5. Opción 5" << std::endl;
         std::cout << "0. Salir" << std::endl;
         std::cout << "=====================" << std::endl;
         std::cout << "Ingrese una opción: ";
-        std::cin >> opcion;
+        std::cin >> option;
 
-        switch (opcion) {
+        switch (option) {
             case 1:
                 std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
                 knightRider(speed);
@@ -96,8 +108,88 @@ void menu()
                 std::cout << "\n*** Opción 4 seleccionada ***\n" << std::endl;
                 //opcion4();
                 break;
+            case 5:
+                std::cout << "\n*** Opción 5 seleccionada ***\n" << std::endl;
+                //opcion5();
+                break;                
             case 0:
                 std::cout << "\nSaliendo del programa..." << std::endl;
+                break;
+            default:
+                std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
+                break;
+        }
+
+        std::cout << std::endl;
+    }
+}
+
+void subMenu(int sequence)
+{
+    int option = -1;
+
+    while (option != 0) {
+        std::cout << "=====================" << std::endl;
+        std::cout << "  Seleccione una plataforma:  " << std::endl;
+        std::cout << "=====================" << std::endl;
+        std::cout << "1. Terminal" << std::endl;
+        std::cout << "2. Leds" << std::endl;
+        std::cout << "0. Salir" << std::endl;
+        std::cout << "=====================" << std::endl;
+        std::cout << "Ingrese una opción: ";
+        std::cin >> option;
+        std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
+
+        switch (option) 
+        {
+            case 1:
+                switch (sequence)
+                {
+                    case 1:
+                        knightRider(speed);
+                        break;
+                    case 2:
+                        crash(speed);
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    default:
+                        std::cout << "\nOpción inválida.\n" << std::endl;
+                        menu();
+                        break;
+                }
+                break;
+
+            case 2:
+                switch (sequence)
+                    {
+                        case 1:
+                            knightRiderA();
+                            intToBinario(0);
+                            break;
+                        case 2:
+                            crashA();
+                            intToBinario(0);
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            std::cout << "\nOpción inválida.\n" << std::endl;
+                            menu();
+                            break;
+                    }
+                break;
+            case 0:
+                std::cout << "\nVolviendo al Menu..." << std::endl;
+                menu();
                 break;
             default:
                 std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
@@ -127,6 +219,61 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     }
     printw("\n");
     refresh();
+}
+
+void intToBinario(int n)
+{
+    int bits[8];
+    int i = 7;
+    while (i != -1) {
+        bits[i] = n % 2;
+        n = n / 2;
+        i = i - 1;
+    }
+    for (int x = 0; x < 8; x++) {
+        ledOn(GPIOpins[x], bits[x]);
+    }
+}
+
+void setupGPIO()
+{
+    system("gpio -g mode 8 output");
+	system("gpio -g mode 10 output");
+	system("gpio -g mode 11 output");
+	system("gpio -g mode 12 output");
+	system("gpio -g mode 13 output");
+	system("gpio -g mode 15 output");
+	system("gpio -g mode 16 output");
+	system("gpio -g mode 18 output");
+}
+
+void ledOn(int pin, int estado)
+{
+    const int MAX = 100;
+
+    char cadenaRescri[MAX];
+    memset(cadenaRescri, 0, sizeof(cadenaRescri));
+    sprintf(cadenaRescri, "%u", pin);
+
+    char primera[MAX];
+    memset(primera, 0, sizeof(primera));
+    memccpy(primera, "gpio -g write ", '\0', sizeof(primera)) - 1;
+    memccpy(primera, cadenaRescri, '\0', sizeof(primera));
+
+    char segunda[MAX];
+    memset(segunda, 0, sizeof(segunda));
+    memccpy(segunda, primera, '\0', sizeof(segunda)) - 1;
+    if (estado == 1) {
+        memccpy(segunda, " 1", '\0', sizeof(segunda));
+    } else {
+        memccpy(segunda, " 0", '\0', sizeof(segunda));
+    }
+
+    system(segunda);
+
+    memset(primera, 0, sizeof(primera));
+    memset(segunda, 0, sizeof(segunda));
+    memset(cadenaRescri, 0, sizeof(cadenaRescri));
 }
 
 void knightRider(unsigned long int initialSpeed) 
@@ -253,13 +400,13 @@ void crash(unsigned long int initialSpeed)
     endwin(); 
 }
 
-
 int main()
 {
 
     bool loguedIn = login();
     
     if (loguedIn){
+        setupGPIO();
         menu();
     }
     return 0;

@@ -1,24 +1,24 @@
 .text
-.global Choque
-Choque:
+.global crashA
+crashA:
 				STMFD	SP!, {r0,r4, r5, r6, LR} 
-				LDR		r5, =tabla 
+				LDR		r5, = table 
 				MOV		r6, #0 
 				
-ForCargadeChoque:
+forCrash:
 				LDRB		r4, [r5, r6] 
 				MOV		r0, r4
-				BL		IntToBinario
+				BL		intToBinario
 				ADD		r6, r6, #1  
 				CMP		r6, #7     
-				BNE		ForCargadeChoque	
-				BL		Termino
+				BNE		forCrash	
+				BL		end
 				
 				
 Termino:
 				LDMFD	SP!, {r0,r4, r5, r6, LR} 
 				MOV	PC, LR
-tabla:
+table:
 	.byte 0x81
 	.byte 0x42
 	.byte 0x24
