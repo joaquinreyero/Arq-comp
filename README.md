@@ -1,29 +1,31 @@
 # PROYECTO ARQUITECURA DE COMPUTADORAS I
 
+## CONSIGNA
+
 Los siguientes ejercicios a desarrollar en los prácticos de laboratorio constituyen la columna
 vertebral del proyecto:
 
-1) Escribir una estructura switch-case en código nemotécnico. Esto permite implementar un
+- [x] Escribir una estructura switch-case en código nemotécnico. Esto permite implementar un
 menú.
 
-2) Escribir en código nemotécnico la siguiente función escrita en C.
+- [ ] Escribir en código nemotécnico la siguiente función escrita en C.
  void retardo (unsigned long int a)
  {
  while (a) a--;
  }
 
-3) Implementar el control de acceso al sistema mediante password. Se debe mostrar un
+- [x] Implementar el control de acceso al sistema mediante password. Se debe mostrar un
 mensaje: “Ingrese su password de 5 dígitos:”, mostrar por cada dígito entrado un * y
 comparar con una clave ya cargada en memoria. Si la clave es correcta imprimir un mensaje
 de “Bienvenido al Sistema” y si no lo es imprimir un mensaje de “Password no válida”.
 Después de 3 intentos el programa aborta.
 
-4) Implementar mediante algoritmo una secuencia de luces denominada “Auto fantástico”.
+- [x] Implementar mediante algoritmo una secuencia de luces denominada “Auto fantástico”.
 
-5) Implementar mediante el uso de una tabla de datos la secuencia denominada “La carrera”.
+- [x] Implementar mediante el uso de una tabla de datos la secuencia denominada “La carrera”.
 
 
-Este proyecto consiste en integrar dichos ejercicios de la siguiente manera:
+### ESTE PROYECTO CONSISTE EN INTEGRAR DICHOS EJERCICIOS DE LA SIGUIENTE MANERA:
 
 a) Realice un programa a fin de que el usuario pueda seleccionar desde un menú, una de
 cuatro secuencias de luces posibles. Dos de ellas serán comunes para todos los
@@ -47,20 +49,24 @@ de su programa a fin de percibir la reacción del sistema en forma inmediata,
 independiente de la velocidad actual. La velocidad ajustada en cada secuencia deberá
 conservarse entre llamadas a diferentes secuencias.
 
-# CONDICIONES DE PRESENTACIÓN
+### CONDICIONES DE PRESENTACIÓN
 
 El proyecto deberá presentarse en la fecha establecida para el segundo parcial, y estará
 en condiciones de hacerlo todo programa que cumpla con las especificaciones mínimas
-enunciadas anteriormente. El trabajo se llevará a cabo en grupo de dos estudiantes, que
+enunciadas anteriormente. 
+
+El trabajo se llevará a cabo en grupo de dos estudiantes, que
 al momento de la presentación deberán estar en condiciones de contestar indistintamente
 cualquier pregunta, demostrando en todo momento precisión, claridad conceptual de los
-temas involucrados en el proyecto, y contribución personal al programa. Hay que
-recordar que el proyecto es un parcial con una modalidad diferente a la tradicional, pero
+temas involucrados en el proyecto, y contribución personal al programa. 
+Hay que recordar que el proyecto es un parcial con una modalidad diferente a la tradicional, pero
 parcial al fin. Por lo tanto, la nota es personal, pudiendo darse el caso eventualmente de
 diferentes notas entre los miembros de un mismo equipo.
+
 Al proyecto se le podrán agregar toda clase de opciones que sean pertinentes con lo
 esbozado anteriormente y que significará una mejor evaluación. Estas características
 deberán ser claramente remarcadas en la presentación.
+
 Si por cualquier motivo no se presentara el proyecto en la fecha indicada, se deberá
 considerar el segundo parcial como ausente, y se deberá presentar en la fecha destinada
 a recuperatorio.
