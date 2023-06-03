@@ -5,13 +5,12 @@
 #include <ncurses.h>
 #include <cstring> 
 #include <cstdlib> 
+#include <wiringPi.h>
+
 
 unsigned long int speed = 150000000;
-int GPIOpins[]= {8,10,11,12,13,15,16,18};
-int bits[8];
+int leds[] = {16,15,0,1,2,4,3,5};
 
-extern "C" void knightRiderA();
-extern "C" void crashA();
 
 bool login();
 void menu();
@@ -124,82 +123,6 @@ void menu()
     }
 }
 
-void subMenu(int sequence)
-{
-    int option = -1;
-
-    while (option != 0) {
-        std::cout << "=====================" << std::endl;
-        std::cout << "  Seleccione una plataforma:  " << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "1. Terminal" << std::endl;
-        std::cout << "2. Leds" << std::endl;
-        std::cout << "0. Salir" << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "Ingrese una opción: ";
-        std::cin >> option;
-        std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
-
-        switch (option) 
-        {
-            case 1:
-                switch (sequence)
-                {
-                    case 1:
-                        knightRider(speed);
-                        break;
-                    case 2:
-                        crash(speed);
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        break;
-                    case 5:
-                        break;
-                    default:
-                        std::cout << "\nOpción inválida.\n" << std::endl;
-                        menu();
-                        break;
-                }
-                break;
-
-            case 2:
-                switch (sequence)
-                    {
-                        case 1:
-                            knightRiderA();
-                            intToBinario(0);
-                            break;
-                        case 2:
-                            crashA();
-                            intToBinario(0);
-                            break;
-                        case 3:
-                            break;
-                        case 4:
-                            break;
-                        case 5:
-                            break;
-                        default:
-                            std::cout << "\nOpción inválida.\n" << std::endl;
-                            menu();
-                            break;
-                    }
-                break;
-            case 0:
-                std::cout << "\nVolviendo al Menu..." << std::endl;
-                menu();
-                break;
-            default:
-                std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
-                break;
-        }
-
-        std::cout << std::endl;
-    }
-}
-
 void delay (unsigned long int a) 
 {
     while (a)
@@ -221,59 +144,24 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     refresh();
 }
 
-void intToBinario(int n)
+void displayLeds()
 {
-    int bits[8];
-    int i = 7;
-    while (i != -1) {
-        bits[i] = n % 2;
-        n = n / 2;
-        i = i - 1;
+    for (int i = 0; i < numLEDs; i++) {
+        if (data & (1 << i)) {
+            digitalWrite(leds[i], HIGH);
+        } else {
+            digitalWrite(leds[i], LOW);
+        }
     }
-    for (int x = 0; x < 8; x++) {
-        ledOn(GPIOpins[x], bits[x]);
-    }
+
+    std::cout << std::endl;
 }
 
-void setupGPIO()
+void setupLeds()
 {
-    system("gpio -g mode 8 output");
-	system("gpio -g mode 10 output");
-	system("gpio -g mode 11 output");
-	system("gpio -g mode 12 output");
-	system("gpio -g mode 13 output");
-	system("gpio -g mode 15 output");
-	system("gpio -g mode 16 output");
-	system("gpio -g mode 18 output");
-}
-
-void ledOn(int pin, int estado)
-{
-    const int MAX = 100;
-
-    char cadenaRescri[MAX];
-    memset(cadenaRescri, 0, sizeof(cadenaRescri));
-    sprintf(cadenaRescri, "%u", pin);
-
-    char primera[MAX];
-    memset(primera, 0, sizeof(primera));
-    memccpy(primera, "gpio -g write ", '\0', sizeof(primera)) - 1;
-    memccpy(primera, cadenaRescri, '\0', sizeof(primera));
-
-    char segunda[MAX];
-    memset(segunda, 0, sizeof(segunda));
-    memccpy(segunda, primera, '\0', sizeof(segunda)) - 1;
-    if (estado == 1) {
-        memccpy(segunda, " 1", '\0', sizeof(segunda));
-    } else {
-        memccpy(segunda, " 0", '\0', sizeof(segunda));
+    for (int i = 0; i < 8; i++) {
+        pinMode(leds[i], OUTPUT);
     }
-
-    system(segunda);
-
-    memset(primera, 0, sizeof(primera));
-    memset(segunda, 0, sizeof(segunda));
-    memset(cadenaRescri, 0, sizeof(cadenaRescri));
 }
 
 void knightRider(unsigned long int initialSpeed) 
@@ -289,6 +177,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
+            displayLeds();
 
             data = (data << 1) | (data >> 7);
 
@@ -314,6 +203,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
+            displayLeds();
 
             data = (data >> 1) | (data << 7);
 
@@ -355,6 +245,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
+            displayLeds();
             delay(initialSpeed);
             int key = getch();
             switch (key) {
@@ -378,6 +269,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
+            displayLeds();
             delay(initialSpeed);
             int key = getch();
             switch (key) {
@@ -406,7 +298,7 @@ int main()
     bool loguedIn = login();
     
     if (loguedIn){
-        setupGPIO();
+        setupLeds();
         menu();
     }
     return 0;
