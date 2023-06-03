@@ -17,6 +17,7 @@ void menu();
 void subMenu();
 void delay(unsigned int a);
 void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName);
+void displayLeds(unsigned char data);
 void intToBinario(int n);
 void setupGPIO();
 void ledOn(int pin, int estado);
@@ -144,9 +145,9 @@ void displayTerminal(unsigned char data, unsigned long int speed, const std::str
     refresh();
 }
 
-void displayLeds()
+void displayLeds(unsigned char data)
 {
-    for (int i = 0; i < numLEDs; i++) {
+    for (int i = 0; i < 8; i++) {
         if (data & (1 << i)) {
             digitalWrite(leds[i], HIGH);
         } else {
@@ -159,6 +160,7 @@ void displayLeds()
 
 void setupLeds()
 {
+    wiringPiSetup();
     for (int i = 0; i < 8; i++) {
         pinMode(leds[i], OUTPUT);
     }
@@ -177,7 +179,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
-            displayLeds();
+            displayLeds(data);
 
             data = (data << 1) | (data >> 7);
 
@@ -203,7 +205,7 @@ void knightRider(unsigned long int initialSpeed)
         for (int i = 0; i < 7; i++) {
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
-            displayLeds();
+            displayLeds(data);
 
             data = (data >> 1) | (data << 7);
 
@@ -245,7 +247,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
-            displayLeds();
+            displayLeds(table[i]);
             delay(initialSpeed);
             int key = getch();
             switch (key) {
@@ -269,7 +271,7 @@ void crash(unsigned long int initialSpeed)
         {
             clear();
             displayTerminal(table[i], initialSpeed, "Crash");
-            displayLeds();
+            displayLeds(table[i]);
             delay(initialSpeed);
             int key = getch();
             switch (key) {
