@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
@@ -72,55 +71,81 @@ bool login()
     return false;
 }
 
-void menu() 
-{
+void menu() {
     int option = -1;
+    int speed = 0;
+
+    initscr();  
+    cbreak();   
+    keypad(stdscr, TRUE); 
+    noecho();   
 
     while (option != 0) {
-        std::cout << "=====================" << std::endl;
-        std::cout << "      BIENVENIDO      " << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "1. El auto fantástico" << std::endl;
-        std::cout << "2. El choque" << std::endl;
-        std::cout << "3. Opción 3" << std::endl;
-        std::cout << "4. Opción 4" << std::endl;
-        std::cout << "5. Opción 5" << std::endl;
-        std::cout << "0. Salir" << std::endl;
-        std::cout << "=====================" << std::endl;
-        std::cout << "Ingrese una opción: ";
-        std::cin >> option;
+        clear();  
+        printw("=====================\n");
+        printw("      BIENVENIDO      \n");
+        printw("=====================\n");
+        printw("1. El auto fantástico\n");
+        printw("2. El choque\n");
+        printw("3. Opción 3\n");
+        printw("4. Opción 4\n");
+        printw("5. Opción 5\n");
+        printw("0. Salir\n");
+        printw("=====================\n");
+        printw("Ingrese una opción: ");
+        refresh();  
+
+        scanw("%d", &option);  
 
         switch (option) {
             case 1:
-                std::cout << "\n*** Ejecutando el auto fantástico ***\n" << std::endl;
+                printw("\n*** Ejecutando el auto fantástico ***\n\n");
+                refresh();
                 knightRider(speed);
                 break;
+                return;
             case 2:
-                std::cout << "\n*** Ejecutando el choque ***\n" << std::endl;
-                crash(speed);
+                printw("\n*** Ejecutando el choque ***\n\n");
+                refresh();
+                // crash(speed);
                 break;
+                return;
             case 3:
-                std::cout << "\n*** Opción 3 seleccionada ***\n" << std::endl;
-                //opcion3();
+                printw("\n*** Opción 3 seleccionada ***\n\n");
+                refresh();
+                // opcion3();
                 break;
+                return;
             case 4:
-                std::cout << "\n*** Opción 4 seleccionada ***\n" << std::endl;
-                //opcion4();
+                printw("\n*** Opción 4 seleccionada ***\n\n");
+                refresh();
+                // opcion4();
                 break;
+                return;
             case 5:
-                std::cout << "\n*** Opción 5 seleccionada ***\n" << std::endl;
-                //opcion5();
-                break;                
+                printw("\n*** Opción 5 seleccionada ***\n\n");
+                refresh();
+                // opcion5();
+                break;
+                return;                
             case 0:
-                std::cout << "\nSaliendo del programa..." << std::endl;
+                printw("\nSaliendo del programa...\n");
+                refresh();
                 break;
+                return;
             default:
-                std::cout << "\nOpción inválida. Intente nuevamente.\n" << std::endl;
+                printw("\nOpción inválida. Intente nuevamente.\n\n");
+                refresh();
                 break;
+                return;
         }
 
-        std::cout << std::endl;
+        printw("\nPresione cualquier tecla para continuar...");
+        refresh();
+        getch();  // Espera a que se presione una tecla
     }
+
+    endwin();  
 }
 
 void delay (unsigned long int a) 
@@ -161,6 +186,13 @@ void setupLeds()
 {
     for (int i = 0; i < 8; i++) {
         pinMode(leds[i], OUTPUT);
+    }
+}
+
+void turnOffLeds()
+{
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(leds[i], low);
     }
 }
 
