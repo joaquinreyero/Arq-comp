@@ -1,0 +1,3 @@
+g++ -o local local.cpp  knightRiderASM.o -lncurses -lwiringPi
+
+as -o knightRiderASM.o knightRiderASM.s 

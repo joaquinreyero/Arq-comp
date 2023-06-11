@@ -1,14 +1,15 @@
 .text
-.global knightRiderA
 
-knightRiderA:
+.global knightRiderASM
+
+knightRiderASM:
 			STMFD	SP!, {r0,r4, r5, r6, r7, LR}
 			MOV		r4, #0x80 
 			MOV		r5, #8 
 			
 forRight:
 			MOV		r0, r4
-			BL		intToBinario
+			BL		intToBinary
 			MOV		r4, r4, LSR #1
 			SUBS		r5, r5, #1
 			BNE		forRight
@@ -18,7 +19,7 @@ forRight:
 			
 forLeft:
 			MOV		r0, r4
-			BL		intToBinario
+			BL		intToBinary
 			MOV		r4, r4, LSL #1
 			SUBS		r5, r5, #1
 			BNE		forLeft

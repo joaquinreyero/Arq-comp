@@ -6,6 +6,7 @@
 unsigned long int speed = 15000000;
 int leds[] = {16,15,0,1,2,4,3,5};
 
+extern "C" void knightRiderASM();
 
 bool login();
 void menu();
@@ -16,6 +17,7 @@ void setupLeds();
 void turnOffLeds();
 void knightRider(unsigned long int initialSpeed);
 void crash(unsigned long int initialSpeed);
+void intToBinary(unsigned char data);
 
 
 bool login() 
@@ -335,14 +337,27 @@ void crash(unsigned long int initialSpeed)
     endwin(); 
 }
 
+void intToBinary(unsigned char data)
+{
+    for(int i = 0; i <= 8; i++){
+        
+        if(data % 2 == 0)
+            printw("_");
+        else
+            printw("*");
+            data = data/2;
+            }
+}
+
 int main()
 {
+    knightRiderASM();
 
-    bool loguedIn = login();
+    /*bool loguedIn = login();
     
     if (loguedIn){
         setupLeds();
         menu();
     }
-    return 0;
+    return 0;*/
 }
