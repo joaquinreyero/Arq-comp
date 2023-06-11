@@ -1,25 +1,19 @@
-#include <stdlib.h>
-#include <termios.h>
-#include <unistd.h>
 #include <ncurses.h>
-#include <cstring> 
-#include <cstdlib> 
 #include <wiringPi.h>
+#include <string>
 
 
-unsigned long int speed = 150000000;
+unsigned long int speed = 15000000;
 int leds[] = {16,15,0,1,2,4,3,5};
 
 
 bool login();
 void menu();
-void subMenu();
 void delay(unsigned int a);
 void displayTerminal(unsigned char data, unsigned long int speed, const std::string& sequenceName);
 void displayLeds(unsigned char data);
-void intToBinario(int n);
-void setupGPIO();
-void ledOn(int pin, int estado);
+void setupLeds();
+void turnOffLeds();
 void knightRider(unsigned long int initialSpeed);
 void crash(unsigned long int initialSpeed);
 
@@ -74,7 +68,6 @@ bool login()
 
 void menu() {
     int option = -1;
-    int speed = 0;
 
     initscr();  
     cbreak();   
@@ -82,7 +75,8 @@ void menu() {
     noecho();   
 
     while (option != 0) {
-        clear();  
+        clear();
+        turnOffLeds();  
         printw("=====================\n");
         printw("      BIENVENIDO      \n");
         printw("=====================\n");
@@ -104,31 +98,27 @@ void menu() {
                 refresh();
                 knightRider(speed);
                 break;
-                return;
+            
             case 2:
                 printw("\n*** Ejecutando el choque ***\n\n");
                 refresh();
-                // crash(speed);
+                crash(speed);
                 break;
-                return;
             case 3:
                 printw("\n*** Opción 3 seleccionada ***\n\n");
                 refresh();
                 // opcion3();
                 break;
-                return;
             case 4:
                 printw("\n*** Opción 4 seleccionada ***\n\n");
                 refresh();
                 // opcion4();
                 break;
-                return;
             case 5:
                 printw("\n*** Opción 5 seleccionada ***\n\n");
                 refresh();
                 // opcion5();
                 break;
-                return;                
             case 0:
                 printw("\nSaliendo del programa...\n");
                 refresh();
@@ -138,12 +128,11 @@ void menu() {
                 printw("\nOpción inválida. Intente nuevamente.\n\n");
                 refresh();
                 break;
-                return;
         }
 
         printw("\nPresione cualquier tecla para continuar...");
         refresh();
-        getch();  // Espera a que se presione una tecla
+        getch();  
     }
 
     endwin();  
@@ -180,7 +169,6 @@ void displayLeds(unsigned char data)
         }
     }
 
-    std::cout << std::endl;
 }
 
 void setupLeds()
@@ -194,36 +182,43 @@ void setupLeds()
 void turnOffLeds()
 {
     for (int i = 0; i < 8; i++) {
-        digitalWrite(leds[i], low);
+        digitalWrite(leds[i], LOW);
     }
 }
 
 void knightRider(unsigned long int initialSpeed) 
 {
     unsigned char data = 0x01;
+    
     initscr();
     curs_set(0); // Ocultar el cursor
     nodelay(stdscr, true); // Habilitar la entrada no bloqueante
     keypad(stdscr, true); // Habilitar el modo de captura de teclas especiales
+    
+    bool exit = true;
 
     while (true) {
 
         for (int i = 0; i < 7; i++) {
+            
             clear();
             displayTerminal(data, initialSpeed, "KnightRider");
-            displayLeds(data);
-
             data = (data << 1) | (data >> 7);
-
+            displayLeds(data);
             delay(initialSpeed);
 
             int key = getch();
+            
             switch (key) {
-                case 27: // Tecla Escape
-                    endwin();
+                case 27:
                     speed = initialSpeed;
-                    std::cout << "\n*** Cerrando el auto fantástico ***\n" << std::endl; 
-                    menu();
+                    curs_set(1); 
+                    nodelay(stdscr, false); 
+                    keypad(stdscr, false); 
+                    endwin();
+                    exit = false;
+                    return;
+                    
                 case KEY_UP: 
                     if (initialSpeed >= 10000000)
                         initialSpeed -= 10000000;
@@ -233,35 +228,38 @@ void knightRider(unsigned long int initialSpeed)
                     break;
             }
         }
+        if (exit != false) {
+            
+            for (int i = 0; i < 7; i++) {
+                clear();
+                displayTerminal(data, initialSpeed, "KnightRider");
+                displayLeds(data);
+                data = (data >> 1) | (data << 7);
+                delay(initialSpeed);
 
-        for (int i = 0; i < 7; i++) {
-            clear();
-            displayTerminal(data, initialSpeed, "KnightRider");
-            displayLeds(data);
-
-            data = (data >> 1) | (data << 7);
-
-            delay(initialSpeed);
-
-            int key = getch();
-            switch (key) {
-                case 27: // Tecla Escape
-                    endwin();
-                    speed = initialSpeed; 
-                    std::cout << "\n*** Cerrando el auto fantástico ***\n" << std::endl;
-                    menu();
-                case KEY_UP: 
-                    if (initialSpeed >= 10000000)
-                        initialSpeed -= 10000000;
-                    break;
-                case KEY_DOWN: 
-                    initialSpeed += 10000000;
-                    break;
+                int key = getch();
+                switch (key) {
+                    case 27: 
+                        speed = initialSpeed;
+                        curs_set(1); 
+                        nodelay(stdscr, false); 
+                        keypad(stdscr, false); 
+                        endwin();
+                        return;
+                        
+                    case KEY_UP: 
+                        if (initialSpeed >= 10000000)
+                            initialSpeed -= 10000000;
+                        break;
+                    case KEY_DOWN: 
+                        initialSpeed += 10000000;
+                        break;
+                }
             }
         }
     }
 
-    endwin();
+    return;
 }
 
 void crash(unsigned long int initialSpeed) 
@@ -272,7 +270,9 @@ void crash(unsigned long int initialSpeed)
     curs_set(0); // Ocultar el cursor
     nodelay(stdscr, true); // Habilitar la entrada no bloqueante
     keypad(stdscr, true); // Habilitar el modo de captura de teclas especiales
-        
+    
+    bool exit = true;
+    
     while (true) 
     {
         for (int i = 0; i < 4; i++)
@@ -282,12 +282,16 @@ void crash(unsigned long int initialSpeed)
             displayLeds(table[i]);
             delay(initialSpeed);
             int key = getch();
+            
             switch (key) {
-                case 27: // Tecla Escape
+                case 27: 
+                    speed = initialSpeed;
+                    curs_set(1); 
+                    nodelay(stdscr, false); 
+                    keypad(stdscr, false); 
                     endwin();
-                    speed = initialSpeed; 
-                    std::cout << "\n*** Cerrando el choque ***\n" << std::endl;
-                    menu();
+                    exit = false;
+                    return;
                 case KEY_UP: 
                     if (initialSpeed >= 10000000)
                         initialSpeed -= 10000000;
@@ -299,27 +303,32 @@ void crash(unsigned long int initialSpeed)
             if (i == 4)
                  delay(initialSpeed);
         }
-        for (int i = 3; i > 0; i--)
-        {
-            clear();
-            displayTerminal(table[i], initialSpeed, "Crash");
-            displayLeds(table[i]);
-            delay(initialSpeed);
-            int key = getch();
-            switch (key) {
-                case 27: // Tecla Escape
-                    endwin();
-                    speed = initialSpeed;
-                    std::cout << "\n*** Cerrando el choque ***\n" << std::endl; 
-                    menu();
-                case KEY_UP: 
-                    if (initialSpeed >= 10000000)
-                        initialSpeed -= 10000000;
-                    break;
-                case KEY_DOWN: 
-                    initialSpeed += 10000000;
-                    break;
-            }  
+        if (exit != false) {
+            for (int i = 3; i > 0; i--)
+            {
+                clear();
+                displayTerminal(table[i], initialSpeed, "Crash");
+                displayLeds(table[i]);
+                delay(initialSpeed);
+                int key = getch();
+                switch (key) {
+                    case 27: 
+                        speed = initialSpeed;
+                        curs_set(1); 
+                        nodelay(stdscr, false); 
+                        keypad(stdscr, false); 
+                        endwin();
+                        exit = false;
+                        return;
+                    case KEY_UP: 
+                        if (initialSpeed >= 10000000)
+                            initialSpeed -= 10000000;
+                        break;
+                    case KEY_DOWN: 
+                        initialSpeed += 10000000;
+                        break;
+                }  
+            }
         }    
     }
     
