@@ -9,7 +9,7 @@ knightRiderASM:
 			
 forRight:
 			MOV		r0, r4
-			BL		intToBinary
+			BL		disp_binary
 			MOV		r4, r4, LSR #1
 			SUBS		r5, r5, #1
 			BNE		forRight
@@ -19,7 +19,7 @@ forRight:
 			
 forLeft:
 			MOV		r0, r4
-			BL		intToBinary
+			BL		disp_binary
 			MOV		r4, r4, LSL #1
 			SUBS		r5, r5, #1
 			BNE		forLeft

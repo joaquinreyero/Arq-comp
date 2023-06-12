@@ -1,3 +1,21 @@
-g++ -o local local.cpp  knightRiderASM.o -lncurses -lwiringPi
+
+g++ -c local.cpp -o local.o -lncurses -lwiringPi
 
 as -o knightRiderASM.o knightRiderASM.s 
+
+as -o test.o test.s
+
+
+
+g++ -o local local.cpp  knightRiderASM.o -lncurses -lwiringPi
+
+gcc -o local local.c knightRiderASM.s -lncurses -lwiringPi -no-pie
+
+g++ -o local local.o test.o -lncurses -lwiringPi -no-pie
+
+
+
+stty echo
+
+
+reset
