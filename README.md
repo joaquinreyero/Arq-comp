@@ -8,7 +8,7 @@ vertebral del proyecto:
 - [x] Escribir una estructura switch-case en código nemotécnico. Esto permite implementar un
 menú.
 
-- [ ] Escribir en código nemotécnico la siguiente función escrita en C.
+- [x] Escribir en código nemotécnico la siguiente función escrita en C.
  void retardo (unsigned long int a)
  {
  while (a) a--;
