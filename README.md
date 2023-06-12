@@ -18,11 +18,12 @@ vertebral del proyecto:
 menú.
 
 - [x] Escribir en código nemotécnico la siguiente función escrita en C.
- void retardo (unsigned long int a)
+<pre>
+void retardo (unsigned long int a)
  {
  while (a) a--;
  }
-
+ </pre>
 - [x] Implementar el control de acceso al sistema mediante password. Se debe mostrar un
 mensaje: “Ingrese su password de 5 dígitos:”, mostrar por cada dígito entrado un * y
 comparar con una clave ya cargada en memoria. Si la clave es correcta imprimir un mensaje
@@ -79,6 +80,3 @@ deberán ser claramente remarcadas en la presentación.
 Si por cualquier motivo no se presentara el proyecto en la fecha indicada, se deberá
 considerar el segundo parcial como ausente, y se deberá presentar en la fecha destinada
 a recuperatorio.
-
-
-
