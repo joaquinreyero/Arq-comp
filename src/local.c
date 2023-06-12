@@ -4,15 +4,16 @@
 #include <wiringPi.h>
 #include <string.h>
 
-unsigned long int speed = 15000000;
+unsigned long int speed = 10000000;
 int leds[] = {16, 15, 0, 1, 2, 4, 3, 5};
 int bits[8];
 bool quit;
 
 extern void knightRiderASM();
-//extern void crashASM();
-extern void crashA();
-//extern void Carrera();
+extern void policeLightASM();
+extern void crashASM();
+extern void raceASM();
+extern void wavesASM();
 
 bool login();
 void menu();
@@ -23,7 +24,15 @@ void setupLeds();
 void turnOffLeds();
 void knightRider(unsigned long int initialSpeed);
 void crash(unsigned long int initialSpeed);
+void race(unsigned long int initialSpeed);
+void policelights(unsigned long int initialSpeed);
+void waves(unsigned long int initialSpeed);
 void intToBinary(int data);
+void knightRiderASMinC();
+void policeLightASMinC();
+void crashASMinC();
+void raceASMinC();
+void wavesASMinC();
 
 bool login() 
 {
@@ -92,9 +101,9 @@ void menu()
         printw("=====================\n");
         printw("1. El auto fantástico\n");
         printw("2. El choque\n");
-        printw("3. Opción 3\n");
-        printw("4. Opción 4\n");
-        printw("5. Opción 5\n");
+        printw("3. La carrera \n");
+        printw("4. Luces policiales\n");
+        printw("5. Las oleas\n");
         printw("0. Regresar al menu principal\n");
         printw("=====================\n");
         printw("Ingrese una opción: ");
@@ -118,24 +127,24 @@ void menu()
                 break;
 
             case 3:
-                printw("\n*** Opción 3 seleccionada ***\n\n");
+                printw("\n*** Ejecutando la carrera ***\n\n");
                 refresh();
                 noecho();
-                // opcion3();
+                race(speed);
                 break;
 
             case 4:
-                printw("\n*** Opción 4 seleccionada ***\n\n");
+                printw("\n*** Ejecutando luces policiales ***\n\n");
                 refresh();
                 noecho();
-                // opcion4();
+                policelights(speed);
                 break;
 
             case 5:
-                printw("\n*** Opción 5 seleccionada ***\n\n");
+                printw("\n*** Ejecutando las olas ***\n\n");
                 refresh();
                 noecho();
-                // opcion5();
+                waves(speed);
                 break;
 
             case 0:
@@ -148,10 +157,6 @@ void menu()
                 refresh();
                 break;
         }
-        
-        printw("\nPresione cualquier tecla para continuar...");
-        refresh();
-        getch();
     }
 
     endwin();
@@ -166,6 +171,8 @@ void menuASM()
     cbreak();
     keypad(stdscr, TRUE);
     echo();
+    
+    quit = false;
 
     while (option != 0) {
         echo();
@@ -176,9 +183,9 @@ void menuASM()
         printw("=====================\n");
         printw("1. El auto fantástico\n");
         printw("2. El choque\n");
-        printw("3. Opción 3\n");
-        printw("4. Opción 4\n");
-        printw("5. Opción 5\n");
+        printw("3. La carrera\n");
+        printw("4. Luces policiales\n");
+        printw("5. Las olas \n");
         printw("0. Regresar al menu principal\n");
         printw("=====================\n");
         printw("Ingrese una opción: ");
@@ -191,50 +198,49 @@ void menuASM()
                 printw("\n*** Ejecutando el auto fantástico ***\n\n");
                 refresh();
                 noecho();
-                knightRiderASM();
+                knightRiderASMinC();
                 break;
 
             case 2:
                 printw("\n*** Ejecutando el choque ***\n\n");
                 refresh();
                 noecho();
+                crashASMinC();
                 break;
 
             case 3:
-                printw("\n*** Opción 3 seleccionada ***\n\n");
+                printw("\n*** Ejecutando la carrera ***\n\n");
                 refresh();
                 noecho();
-                // opcion3();
+                raceASMinC();
                 break;
 
             case 4:
-                printw("\n*** Opción 4 seleccionada ***\n\n");
+                printw("\n*** Ejectuando luces policiales ***\n\n");
                 refresh();
                 noecho();
-                // opcion4();
+                policeLightASMinC();
                 break;
 
             case 5:
-                printw("\n*** Opción 5 seleccionada ***\n\n");
+                printw("\n*** Ejecutando las olas ***\n\n");
                 refresh();
                 noecho();
-                // opcion5();
+                wavesASMinC();
                 break;
 
             case 0:
                 printw("\nRegresando al menu principal...\n");
                 refresh();
                 break;
-
+                return;
+                
             default:
                 printw("\nOpción inválida. Intente nuevamente.\n\n");
                 refresh();
                 break;
         }
-        
-        printw("\nPresione cualquier tecla para continuar...");
-        refresh();
-        getch();
+        return;
     }
 
     endwin();
@@ -317,11 +323,11 @@ void knightRider(unsigned long int initialSpeed)
                     return;
 
                 case KEY_UP:
-                    if (initialSpeed >= 10000000)
-                        initialSpeed -= 10000000;
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
                     break;
                 case KEY_DOWN:
-                    initialSpeed += 10000000;
+                    initialSpeed += 1000000;
                     break;
             }
         }
@@ -343,11 +349,78 @@ void knightRider(unsigned long int initialSpeed)
                     return;
 
                 case KEY_UP:
-                    if (initialSpeed >= 10000000)
-                        initialSpeed -= 10000000;
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
                     break;
                 case KEY_DOWN:
-                    initialSpeed += 10000000;
+                    initialSpeed += 1000000;
+                    break;
+            }
+        }
+    }
+}
+
+void policelights(unsigned long int initialSpeed)
+{
+    unsigned char data = 0x11;
+
+    initscr();
+    curs_set(0);
+    nodelay(stdscr, TRUE);
+    keypad(stdscr, TRUE);
+
+    while (1) {
+
+        for (int i = 0; i < 3; i++) {
+
+            displayTerminal(data, initialSpeed, "Policelights");
+            displayLeds(data);
+            data = (data << 1) | (data >> 7);
+            delayT(initialSpeed);
+
+            int key = getch();
+
+            switch (key) {
+                case 27:
+                    speed = initialSpeed;
+                    curs_set(1);
+                    nodelay(stdscr, FALSE);
+                    keypad(stdscr, FALSE);
+                    endwin();
+                    return;
+
+                case KEY_UP:
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
+                    break;
+                case KEY_DOWN:
+                    initialSpeed += 1000000;
+                    break;
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            displayTerminal(data, initialSpeed, "Policelights");
+            displayLeds(data);
+            data = (data >> 1) | (data << 7);
+            delayT(initialSpeed);
+
+            int key = getch();
+            switch (key) {
+                case 27:
+                    speed = initialSpeed;
+                    curs_set(1);
+                    nodelay(stdscr, FALSE);
+                    keypad(stdscr, FALSE);
+                    endwin();
+                    return;
+
+                case KEY_UP:
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
+                    break;
+                case KEY_DOWN:
+                    initialSpeed += 1000000;
                     break;
             }
         }
@@ -380,11 +453,11 @@ void crash(unsigned long int initialSpeed)
                     endwin();
                     return;
                 case KEY_UP:
-                    if (initialSpeed >= 10000000)
-                        initialSpeed -= 10000000;
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
                     break;
                 case KEY_DOWN:
-                    initialSpeed += 10000000;
+                    initialSpeed += 1000000;
                     break;
             }
             if (i == 4)
@@ -405,7 +478,48 @@ void crash(unsigned long int initialSpeed)
                     endwin();
                     return;
                 case KEY_UP:
-                    if (initialSpeed >= 10000000)
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
+                    break;
+                case KEY_DOWN:
+                    initialSpeed += 1000000;
+                    break;
+            }
+        }
+    }
+
+    endwin();
+}
+
+void race(unsigned long int initialSpeed)
+{
+    unsigned char table[] = {0xA0, 0x30, 0x08, 0x06,0x03,0x01};
+    initscr();
+    curs_set(0); 
+    nodelay(stdscr, TRUE); 
+    keypad(stdscr, TRUE); 
+    
+    while(1){
+
+        for (int i = 0; i < 6; i++) {
+            unsigned char data = table[i];
+            
+            displayTerminal(data, initialSpeed, "Race");
+            displayLeds(data);
+            
+            delayT(initialSpeed);
+            int key = getch();
+
+            switch (key) {
+                case 27:
+                    speed = initialSpeed;
+                    curs_set(1);
+                    nodelay(stdscr, FALSE);
+                    keypad(stdscr, FALSE);
+                    endwin();
+                    return;
+                case KEY_UP:
+                    if (initialSpeed >= 2000000)
                         initialSpeed -= 10000000;
                     break;
                 case KEY_DOWN:
@@ -414,8 +528,73 @@ void crash(unsigned long int initialSpeed)
             }
         }
     }
-
     endwin();
+}
+
+void waves(unsigned long int initialSpeed)
+{
+    unsigned char data[] = {0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF};
+
+    initscr();
+    curs_set(0);
+    nodelay(stdscr, TRUE);
+    keypad(stdscr, TRUE);
+
+    while (1) {
+        for (int i = 0; i < 7; i++) {
+
+            displayTerminal(data[i], initialSpeed, "Waves");
+            displayLeds(data[i]);
+           
+            delayT(initialSpeed);
+
+            int key = getch();
+
+            switch (key) {
+                case 27:
+                    speed = initialSpeed;
+                    curs_set(1);
+                    nodelay(stdscr, FALSE);
+                    keypad(stdscr, FALSE);
+                    endwin();
+                    return;
+
+                case KEY_UP:
+                    if (initialSpeed >= 2000000)
+                        initialSpeed -= 1000000;
+                    break;
+                case KEY_DOWN:
+                    initialSpeed += 1000000;
+                    break;
+            }
+        }
+
+        for (int i = 7; i > 0; i--) {
+            displayTerminal(data[i], initialSpeed, "Waves");
+            displayLeds(data[i]);
+       
+            delayT(initialSpeed);
+
+            int key = getch();
+            switch (key) {
+                case 27:
+                    speed = initialSpeed;
+                    curs_set(1);
+                    nodelay(stdscr, FALSE);
+                    keypad(stdscr, FALSE);
+                    endwin();
+                    return;
+
+                case KEY_UP:
+                    if (initialSpeed >= 1000000)
+                        initialSpeed -= 1000000;
+                    break;
+                case KEY_DOWN:
+                    initialSpeed += 1000000;
+                    break;
+            }
+        }
+    }
 }
 
 void disp_binary(unsigned int data)
@@ -442,11 +621,11 @@ void disp_binary(unsigned int data)
                     return;
                     
                 case KEY_UP:
-                    if (speed >= 10000000)
-                        speed -= 10000000;
+                    if (speed >= (1500000))
+                        speed -= (1000000);
                     break;
                 case KEY_DOWN:
-                    speed += 10000000;
+                    speed += (1000000);
                     break;
             }
     if (quit == false)
@@ -487,16 +666,43 @@ void knightRiderASMinC()
     while(quit == false){
         knightRiderASM();
     }
-    menu();
+    menuASM();
     return;
+    }
+
+void policeLightASMinC()
+{
+    while(quit == false){
+        policeLightASM();
+    }
+    menuASM();
+    return;    
 }
 
 void crashASMinC()
 {
     while(quit == false){
-        crashA();
+        crashASM();
     }
-    menu();
+    menuASM();
+    return;
+}
+
+void raceASMinC()
+{
+    while(quit == false){
+        raceASM();
+    }
+    menuASM();
+    return;
+}
+
+void wavesASMinC()
+{
+    while(quit == false){
+        wavesASM();
+    }
+    menuASM();
     return;
 }
 
@@ -550,7 +756,6 @@ int main()
                     printw("\nOpción inválida. Intente nuevamente.\n\n");
                     refresh();
                     break;
-            
             }
         }
     }

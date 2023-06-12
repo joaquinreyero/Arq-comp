@@ -70,3 +70,6 @@ deberán ser claramente remarcadas en la presentación.
 Si por cualquier motivo no se presentara el proyecto en la fecha indicada, se deberá
 considerar el segundo parcial como ausente, y se deberá presentar en la fecha destinada
 a recuperatorio.
+
+
+sudo gcc -o bin/local src/local.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
