@@ -1,5 +1,14 @@
 # PROYECTO ARQUITECURA DE COMPUTADORAS I
 
+## COMO EJECUTAR
+<pre>
+sudo git clone https://github.com/joaquinreyero/Arq-comp.git
+sudo cd Arq-comp
+sudo gcc -o bin/project src/project.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
+sudo cd/bin
+sudo ./project
+</pre>
+
 ## CONSIGNA
 
 Los siguientes ejercicios a desarrollar en los prácticos de laboratorio constituyen la columna
@@ -72,6 +81,4 @@ considerar el segundo parcial como ausente, y se deberá presentar en la fecha d
 a recuperatorio.
 
 
-sudo gcc -o bin/project src/project.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
-sudo cd/bin
-sudo ./project
+
