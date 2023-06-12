@@ -45,7 +45,7 @@ bool login()
 
     while (attempts < maxAttempts) {
         char enteredPsw[6] = ""; 
-        printw("Ingresa la clave de 5 dígitos: ");
+        printw("Ingresa la clave de 5 digitos: ");
         refresh();
 
         char c;
@@ -76,7 +76,7 @@ bool login()
         }
     }
 
-    printw("Número máximo de intentos alcanzado. Acceso denegado.\n");
+    printw("Número maximo de intentos alcanzado. Acceso denegado.\n");
     refresh();
     endwin();
     return false;
@@ -99,21 +99,21 @@ void menu()
         printw("=====================\n");
         printw("      BIENVENIDO      \n");
         printw("=====================\n");
-        printw("1. El auto fantástico\n");
+        printw("1. El auto fantastico\n");
         printw("2. El choque\n");
         printw("3. La carrera \n");
         printw("4. Luces policiales\n");
         printw("5. Las oleas\n");
         printw("0. Regresar al menu principal\n");
         printw("=====================\n");
-        printw("Ingrese una opción: ");
+        printw("Ingrese una opcion: ");
         refresh();
 
         scanw("%d", &option);
 
         switch (option) {
             case 1:
-                printw("\n*** Ejecutando el auto fantástico ***\n\n");
+                printw("\n*** Ejecutando el auto fantastico ***\n\n");
                 refresh();
                 noecho();
                 knightRider(speed);
@@ -153,7 +153,7 @@ void menu()
                 break;
 
             default:
-                printw("\nOpción inválida. Intente nuevamente.\n\n");
+                printw("\nOpción invalida. Intente nuevamente.\n\n");
                 refresh();
                 break;
         }
@@ -181,21 +181,21 @@ void menuASM()
         printw("=====================\n");
         printw("      BIENVENIDO      \n");
         printw("=====================\n");
-        printw("1. El auto fantástico\n");
+        printw("1. El auto fantastico\n");
         printw("2. El choque\n");
         printw("3. La carrera\n");
         printw("4. Luces policiales\n");
         printw("5. Las olas \n");
         printw("0. Regresar al menu principal\n");
         printw("=====================\n");
-        printw("Ingrese una opción: ");
+        printw("Ingrese una opcion: ");
         refresh();
 
         scanw("%d", &option);
 
         switch (option) {
             case 1:
-                printw("\n*** Ejecutando el auto fantástico ***\n\n");
+                printw("\n*** Ejecutando el auto fantastico ***\n\n");
                 refresh();
                 noecho();
                 knightRiderASMinC();
@@ -236,7 +236,7 @@ void menuASM()
                 return;
                 
             default:
-                printw("\nOpción inválida. Intente nuevamente.\n\n");
+                printw("\nOpcion inválida. Intente nuevamente.\n\n");
                 refresh();
                 break;
         }

@@ -72,4 +72,6 @@ considerar el segundo parcial como ausente, y se deberá presentar en la fecha d
 a recuperatorio.
 
 
-sudo gcc -o bin/local src/local.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
+sudo gcc -o bin/project src/project.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
+sudo cd/bin
+sudo ./project
