@@ -9,12 +9,6 @@ int leds[] = {16, 15, 0, 1, 2, 4, 3, 5};
 int bits[8];
 bool quit;
 
-extern void knightRiderASM();
-extern void policeLightASM();
-extern void crashASM();
-extern void raceASM();
-extern void wavesASM();
-
 bool login();
 void menu();
 void delay(unsigned int a);
@@ -27,12 +21,7 @@ void crash(unsigned long int initialSpeed);
 void race(unsigned long int initialSpeed);
 void policelights(unsigned long int initialSpeed);
 void waves(unsigned long int initialSpeed);
-void intToBinary(int data);
-void knightRiderASMinC();
-void policeLightASMinC();
-void crashASMinC();
-void raceASMinC();
-void wavesASMinC();
+
 
 bool login() 
 {
@@ -104,7 +93,7 @@ void menu()
         printw("3. La carrera \n");
         printw("4. Luces policiales\n");
         printw("5. Las oleas\n");
-        printw("0. Regresar al menu principal\n");
+        printw("0. Salir\n");
         printw("=====================\n");
         printw("Ingrese una opcion: ");
         refresh();
@@ -148,7 +137,7 @@ void menu()
                 break;
 
             case 0:
-                printw("\nRegresando al menu principal...\n");
+                printw("\nCerrando...\n");
                 refresh();
                 break;
 
@@ -157,90 +146,6 @@ void menu()
                 refresh();
                 break;
         }
-    }
-
-    endwin();
-}
-
-void menuASM() 
-{
-    
-    int option = -1;
-    
-    initscr();
-    cbreak();
-    keypad(stdscr, TRUE);
-    echo();
-    
-    quit = false;
-
-    while (option != 0) {
-        echo();
-        clear();
-        turnOffLeds();
-        printw("=====================\n");
-        printw("      BIENVENIDO      \n");
-        printw("=====================\n");
-        printw("1. El auto fantastico\n");
-        printw("2. El choque\n");
-        printw("3. La carrera\n");
-        printw("4. Luces policiales\n");
-        printw("5. Las olas \n");
-        printw("0. Regresar al menu principal\n");
-        printw("=====================\n");
-        printw("Ingrese una opcion: ");
-        refresh();
-
-        scanw("%d", &option);
-
-        switch (option) {
-            case 1:
-                printw("\n*** Ejecutando el auto fantastico ***\n\n");
-                refresh();
-                noecho();
-                knightRiderASMinC();
-                break;
-
-            case 2:
-                printw("\n*** Ejecutando el choque ***\n\n");
-                refresh();
-                noecho();
-                crashASMinC();
-                break;
-
-            case 3:
-                printw("\n*** Ejecutando la carrera ***\n\n");
-                refresh();
-                noecho();
-                raceASMinC();
-                break;
-
-            case 4:
-                printw("\n*** Ejectuando luces policiales ***\n\n");
-                refresh();
-                noecho();
-                policeLightASMinC();
-                break;
-
-            case 5:
-                printw("\n*** Ejecutando las olas ***\n\n");
-                refresh();
-                noecho();
-                wavesASMinC();
-                break;
-
-            case 0:
-                printw("\nRegresando al menu principal...\n");
-                refresh();
-                break;
-                return;
-                
-            default:
-                printw("\nOpcion inválida. Intente nuevamente.\n\n");
-                refresh();
-                break;
-        }
-        return;
     }
 
     endwin();
@@ -268,7 +173,7 @@ void displayTerminal(unsigned char data, unsigned long int speed, const char* se
 
 void displayLeds(int data)
 {   
-    
+
     for (int i = 0; i < 8; i++) {
         if (data & (1 << i)) {
             digitalWrite(leds[i], HIGH);
@@ -597,120 +502,13 @@ void waves(unsigned long int initialSpeed)
     }
 }
 
-void disp_binary(unsigned int data)
-{   
-    initscr();
-    curs_set(0); 
-    nodelay(stdscr, TRUE); 
-    keypad(stdscr, TRUE);
-    
-    int i =0;
-    clear();
-    
-    printw("Velocidad: %lu\n", speed);
-    
-    int key = getch();
-    
-    switch (key) {
-                case 27:
-                    curs_set(1);
-                    nodelay(stdscr, FALSE);
-                    keypad(stdscr, FALSE);
-                    endwin();
-                    quit = true;
-                    return;
-                    
-                case KEY_UP:
-                    if (speed >= (1500000))
-                        speed -= (1000000);
-                    break;
-                case KEY_DOWN:
-                    speed += (1000000);
-                    break;
-            }
-    if (quit == false)
-    {
-        for(int t=128; t>0; t=t/2){
-            
-            delayT(speed);
-            
-            if(data & t)
-            {
-                digitalWrite(leds[i], HIGH);
-                printw("*");
-            }
-            else 
-            {
-                digitalWrite(leds[i], LOW);
-                printw("_");
-            }
-            i++;
-                        
-            refresh();
-        }
-    }
-    else
-    {
-        curs_set(1);
-        nodelay(stdscr, FALSE);
-        keypad(stdscr, FALSE);
-        endwin();
-        quit = true;
-        return;
-    }
-            
-}
-
-void knightRiderASMinC()
-{
-    while(quit == false){
-        knightRiderASM();
-    }
-    menuASM();
-    return;
-    }
-
-void policeLightASMinC()
-{
-    while(quit == false){
-        policeLightASM();
-    }
-    menuASM();
-    return;    
-}
-
-void crashASMinC()
-{
-    while(quit == false){
-        crashASM();
-    }
-    menuASM();
-    return;
-}
-
-void raceASMinC()
-{
-    while(quit == false){
-        raceASM();
-    }
-    menuASM();
-    return;
-}
-
-void wavesASMinC()
-{
-    while(quit == false){
-        wavesASM();
-    }
-    menuASM();
-    return;
-}
-
 int main()
 {   
     bool loguedIn = login();
     
     if (loguedIn) {
+
+        turnOffLeds();
         
         setupLeds();
         
@@ -719,45 +517,7 @@ int main()
         cbreak();
         keypad(stdscr, TRUE);
         echo();
-
-        while (option != 0) {
-            echo();
-            clear();
-            turnOffLeds();
-            printw("==========================================\n");
-            printw("      Desea ejecutar atravez de C o ASM      \n");
-            printw("==========================================\n");
-            printw("1. C \n");
-            printw("2. ASM \n");
-            printw("0. Ingrese 0 para salir.      \n");
-            refresh();
-
-            scanw("%d", &option);
-
-            switch (option) {
-                case 1:
-                    printw("\n*** Ejecutando en C ***\n\n");
-                    refresh();
-                    menu();
-                    break;
-
-                case 2:
-                    printw("\n*** Ejecutando en ASM ***\n\n");
-                    refresh();
-                    menuASM();
-                    break;
-                case 0:
-                    printw("\nSaliendo del programa...\n");
-                    refresh();
-                    echo();
-                    endwin();
-                    break;
-                default:
-                    printw("\nOpción inválida. Intente nuevamente.\n\n");
-                    refresh();
-                    break;
-            }
-        }
+        menu();
     }
     return 0;
 }
