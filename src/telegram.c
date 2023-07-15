@@ -7,16 +7,18 @@
 #include <jansson.h>
 
 const char* CHAT_ID = "1013618467";
-const char* BOT_TOKEN = "6038152936:AAEwcYM8VsMitg4Bg6YFEGUgXYhdygY2ibM";
+const char* BOT_TOKEN = "6346084597:AAHbSRZ5xBFKGQWpZ-CpbHUOMwVKQUlv9VI";
 
 int leds[] = {16, 15, 0, 1, 2, 4, 3, 5};
 int bits[8];
+long int speed = 30;
+char welcome_message[1000];
 
-void delay(unsigned int a);
 void displayLeds(int data);
 void setupLeds();
 void turnOffLeds();
 void intToBinary(int data);
+void turnOffLeds();
 
 extern void knightRiderASM();
 extern void policeLightASM();
@@ -30,6 +32,26 @@ struct ResponseData
     size_t size;
 };
 
+void delayT(unsigned long int a)
+{
+    while (a)
+        a--;
+}
+
+void setupLeds()
+{
+    wiringPiSetup();
+    for (int i = 0; i < 8; i++) {
+        pinMode(leds[i], OUTPUT);
+    }
+}
+
+void turnOffLeds()
+{
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(leds[i], LOW);
+    }
+}
 
 size_t write_callback(void* contents, size_t size, size_t nmemb, void* userp) 
 {
@@ -92,24 +114,33 @@ void handle_message(const char* text)
     if (strcmp(text, "/1") == 0) {
         printf("Ejecutando el auto fantastico\n");
         send_telegram_message("Ejecutando el Auto fantastico 🚘");
+        send_telegram_message(welcome_message);
         knightRiderASM();
+        turnOffLeds();
     } else if (strcmp(text, "/2") == 0) {
         printf("Ejecutando el choque\n");
         send_telegram_message("Ejecutando el choque 💥");
+        send_telegram_message(welcome_message);
         crashASM();
-        
+        turnOffLeds();
     } else if (strcmp(text, "/3") == 0) {
         printf("Ejecutando la carrera\n");
         send_telegram_message("Ejecutando la carrera 🏁");
+        send_telegram_message(welcome_message);
         raceASM();
+        turnOffLeds();
     } else if (strcmp(text, "/4") == 0) {
         printf("Ejecutando luces policiales\n");
         send_telegram_message("Ejecutando luces policiales 🚨");
+        send_telegram_message(welcome_message);
         policeLightASM();
+        turnOffLeds();
     } else if (strcmp(text, "/5") == 0) {
         printf("Ejecutando la ola\n");
         send_telegram_message("Ejecutando la ola 🏖️");
+        send_telegram_message(welcome_message);
         wavesASM();
+        turnOffLeds();
     } else {
         printf("Mensaje no reconocido\n");
         send_telegram_message("Mensaje no reconocido ");
@@ -117,7 +148,7 @@ void handle_message(const char* text)
 }
 
 void process_telegram_updates() 
-{
+{    
     int last_update_id = 0;
 
     char* response = NULL;
@@ -170,38 +201,29 @@ void process_telegram_updates()
 
 void disp_binary(unsigned int data)
 {   
-    initscr();
-    curs_set(0); 
-    nodelay(stdscr, TRUE); 
-    keypad(stdscr, TRUE);
-    
-    clear();
-    
-    printw("Velocidad: %lu\n", speed);
+    int i = 0;
     
     for(int t=128; t>0; t=t/2)
     {  
-        delayT(speed);
+        delay(speed);
 
         if(data & t)
         {
             digitalWrite(leds[i], HIGH);
-            printw("*");
         }
         else 
         {
         digitalWrite(leds[i], LOW);
-            printw("_");
         }
-        refresh();
+        i++;
     }
 }           
 
 int main() 
 {
-
-    char welcome_message[1000];
-    sprintf(welcome_message, "_____ 🤖  ¡BIENVENIDOS!  🤖 _____ \n\n"
+    setupLeds();
+    turnOffLeds();
+    sprintf(welcome_message, "__ 🤖  ¡BIENVENIDOS!  🤖 __ \n\n"
                                "👇  Selecciona una secuencia  👇\n\n"
                                "🚘  /1 El auto fantastico\n"
                                "💥  /2 El choque\n"
