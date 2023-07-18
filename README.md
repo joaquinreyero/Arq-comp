@@ -5,8 +5,11 @@
 sudo git clone https://github.com/joaquinreyero/Arquitectura-computadora-I.git
 sudo cd Arquitectura-computadora-I
 sudo gcc -o bin/project src/project.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi
+sudo gcc -o bin/telegram src/telegram.c  asm/knightRiderASM.s asm/policeLightASM.s asm/crashASM.s asm/raceASM.s asm/wavesASM.s -lncurses -lwiringPi -ljansson -lcurl
 sudo cd/bin
 sudo ./project
+sudo ./telegram
+
 </pre>
 
 ## CONSIGNA
