@@ -13,12 +13,15 @@ int leds[] = {16, 15, 0, 1, 2, 4, 3, 5};
 int bits[8];
 long int speed = 30;
 char welcome_message[1000];
+char message[1000];
 
 void displayLeds(int data);
 void setupLeds();
 void turnOffLeds();
 void intToBinary(int data);
 void turnOffLeds();
+bool login();
+
 
 extern void knightRiderASM();
 extern void policeLightASM();
@@ -31,6 +34,54 @@ struct ResponseData
     char* data;
     size_t size;
 };
+
+bool login() 
+{
+    const char psw[] = "12345";
+    const int maxAttempts = 3;
+    int attempts = 0;
+
+    initscr(); 
+    noecho(); 
+
+    while (attempts < maxAttempts) {
+        char enteredPsw[6] = ""; 
+        printw("Ingresa la clave de 5 digitos: ");
+        refresh();
+
+        char c;
+        while ((c = getch()) != '\n') {
+            if (c == '\b') {
+                if (strlen(enteredPsw) > 0) {
+                    enteredPsw[strlen(enteredPsw) - 1] = '\0';
+                    printw("\b \b");
+                    refresh();
+                }
+            } else {
+                strncat(enteredPsw, &c, 1); 
+                printw("*");
+                refresh();
+            }
+        }
+        printw("\n");
+
+        if (strcmp(enteredPsw, psw) == 0) {
+            printw("Clave correcta. Acceso concedido.\n");
+            refresh();
+            endwin();
+            return true;
+        } else {
+            printw("Clave incorrecta. Intento fallido.\n");
+            refresh();
+            attempts++;
+        }
+    }
+
+    printw("Número maximo de intentos alcanzado. Acceso denegado.\n");
+    refresh();
+    endwin();
+    return false;
+}
 
 void delayT(unsigned long int a)
 {
@@ -114,34 +165,46 @@ void handle_message(const char* text)
     if (strcmp(text, "/1") == 0) {
         printf("Ejecutando el auto fantastico\n");
         send_telegram_message("Ejecutando el Auto fantastico 🚘");
-        send_telegram_message(welcome_message);
+        send_telegram_message(message);
         knightRiderASM();
         turnOffLeds();
     } else if (strcmp(text, "/2") == 0) {
         printf("Ejecutando el choque\n");
         send_telegram_message("Ejecutando el choque 💥");
-        send_telegram_message(welcome_message);
+        send_telegram_message(message);
         crashASM();
         turnOffLeds();
     } else if (strcmp(text, "/3") == 0) {
         printf("Ejecutando la carrera\n");
         send_telegram_message("Ejecutando la carrera 🏁");
-        send_telegram_message(welcome_message);
+        send_telegram_message(message);
         raceASM();
         turnOffLeds();
     } else if (strcmp(text, "/4") == 0) {
         printf("Ejecutando luces policiales\n");
         send_telegram_message("Ejecutando luces policiales 🚨");
-        send_telegram_message(welcome_message);
+        send_telegram_message(message);
         policeLightASM();
         turnOffLeds();
     } else if (strcmp(text, "/5") == 0) {
         printf("Ejecutando la ola\n");
         send_telegram_message("Ejecutando la ola 🏖️");
-        send_telegram_message(welcome_message);
+        send_telegram_message(message);
         wavesASM();
         turnOffLeds();
-    } else {
+    } else if (strcmp(text, "/6") == 0) {
+        printf("Velocidad aumentada\n");
+        send_telegram_message("Velocidad aumentada\n️");
+        send_telegram_message(message);
+        speed = speed - 8;
+        turnOffLeds();
+    }else if (strcmp(text, "/7") == 0) {
+        printf("Velocidad dismunida\n");
+        send_telegram_message("Velocidad dismunida\n");
+        send_telegram_message(message);
+        speed = speed + 15;
+        turnOffLeds();
+    }else {
         printf("Mensaje no reconocido\n");
         send_telegram_message("Mensaje no reconocido ");
     }
@@ -221,16 +284,33 @@ void disp_binary(unsigned int data)
 
 int main() 
 {
-    setupLeds();
-    turnOffLeds();
-    sprintf(welcome_message, "__ 🤖  ¡BIENVENIDOS!  🤖 __ \n\n"
-                               "👇  Selecciona una secuencia  👇\n\n"
-                               "🚘  /1 El auto fantastico\n"
-                               "💥  /2 El choque\n"
-                               "🏁  /3 La carrera\n"
-                               "🚨  /4 Luces policiales\n"\
-                               "🏖️  /5 La ola");
-    send_telegram_message(welcome_message);
-    process_telegram_updates();
+    bool loguedIn = login();
+    
+    if (loguedIn) {
+        keypad(stdscr, TRUE);
+        echo();
+        setupLeds();
+        turnOffLeds();
+        sprintf(welcome_message, "__ 🤖  ¡BIENVENIDOS!  🤖 __ \n\n"
+                                   "👇  Selecciona una secuencia  👇\n\n"
+                                   "🚘  /1 El auto fantastico\n"
+                                   "💥  /2 El choque\n"
+                                   "🏁  /3 La carrera\n"
+                                   "🚨  /4 Luces policiales\n"\
+                                   "🏖️  /5 La ola");
+                                   
+        sprintf(message,   "👇  Selecciona una secuencia  👇\n\n"
+                                   "🚘  /1 El auto fantastico\n"
+                                   "💥  /2 El choque\n"
+                                   "🏁  /3 La carrera\n"
+                                   "🚨  /4 Luces policiales\n"\
+                                   "🏖️  /5 La ola\n\n\n"
+                                   "👇  Si desea modificar la velocidad 👇 \n\n"
+                                   "⏫  /6 Aumentar velocidad\n"
+                                   "⏬  /7 Disminuir velocidad");
+        send_telegram_message(welcome_message);
+        process_telegram_updates();
+    }
+    
     return 0;
 }
